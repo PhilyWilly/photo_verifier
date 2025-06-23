@@ -16,7 +16,6 @@ A FastAPI-based web application for uploading, storing, and retrieving images as
 ## Setup
 
 1. **Clone the repository**
-   (not working yet)
    ```sh
    git clone PhilyWilly/photo_verifier
    cd photo_verifier
@@ -35,6 +34,7 @@ A FastAPI-based web application for uploading, storing, and retrieving images as
 4. **Access the app**
    - Image upload: [http://127.0.0.1:8000/image_poster/](http://127.0.0.1:8000/image_poster/)
    - Image search: [http://127.0.0.1:8000/image_getter/](http://127.0.0.1:8000/image_getter/)
+   (dont forget to use the secret api key)
 
 ## Project Structure
 ```
@@ -43,6 +43,7 @@ photo_verifyer/
 │   ├── main.py
 │   ├── database.py
 │   ├── validations.py
+│   ├── storing_logic.py
 │   └── ...
 ├── static/
 │   ├── get_images.js
@@ -63,8 +64,7 @@ photo_verifyer/
 - `GET /all_order_numbers/` — Get all order numbers
 
 ## TODOS
-- [ ] Add sensitive information to env
-- [ ] Configure the gitignore file
+- [ ] Create automated deleting algorithm
 
 ## License
 MIT
