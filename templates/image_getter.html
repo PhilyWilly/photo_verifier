@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Image Getter</title>
+    <link rel="stylesheet" href="/static/style.css">
+    <link rel="shortcut icon" href="{{ favicon_url }}">
+</head>
+<body>
+    <div style="
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    ">
+        <div style="
+            display: flex; 
+            flex-direction: column;
+            align-items: center;
+            max-width: 1280px;
+            padding: 16px;
+            margin: 32px;
+            background-color: #e9edf0;
+        ">
+            <form id="orderForm">
+                <div style="display: flex; gap: 8px;">
+                    <div style="display: flex; flex-direction: column;">
+                        <input list="suggestions" name="ordernumber" id="ordernumber" type="text" placeholder="Bestellungsnummer">
+                        <datalist id="suggestions"></datalist>
+                    </div>
+                    <input type="submit" name="submit" value="Suchen">
+                </div>
+            </form>
+            <div id="imagesGrid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(600px, 2fr)); gap: 10px; margin-top: 20px;"></div>
+        </div>
+    </div>
+    <script src="/static/get_images.js"></script>
+</body>
+</html>

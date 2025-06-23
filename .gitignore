@@ -1,0 +1,10 @@
+*.env
+*.pyc
+
+database.db
+
+/.VSCodeCounter
+/.venv
+__pycache__
+
+/uploaded_images/*

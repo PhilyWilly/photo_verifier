@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Image poster</title>
+    <link rel="stylesheet" href="/static/style.css">
+    <link rel="shortcut icon" href="{{ favicon_url }}">
+</head>
+<body>
+    <div style="
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    ">
+        <div style="
+            display: flex; 
+            flex-direction: column;
+            align-items: center;
+            max-width: 960px;
+            padding: 16px;
+            margin: 32px;
+            background-color: #e9edf0;
+        ">
+            <form id="orderForm" enctype="multipart/form-data">
+                <div style="display: flex; flex-direction: column; gap: 8px;">
+                    <input name="ordernumber" id="ordernumber" type="text" placeholder="Bestellungsnummer">
+                    <input name="images" id="images" type="file" multiple accept="image/*" style="
+                        min-height: 80px;
+                    ">
+                    <input type="submit" name="submit" value="Hochladen">
+                </div>
+            </form>
+        </div>
+    </div>
+    <script src="/static/post_images.js"></script>
+</body>
+</html>
