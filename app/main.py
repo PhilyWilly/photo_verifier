@@ -1,4 +1,4 @@
-from fastapi import FastAPI, Request, UploadFile, File, Form, HTTPException, Depends
+from fastapi import FastAPI, Request, UploadFile, File, Form, HTTPException, Depends, Query
 from fastapi.responses import HTMLResponse, FileResponse, JSONResponse, RedirectResponse
 from fastapi.templating import Jinja2Templates
 from fastapi.staticfiles import StaticFiles
@@ -87,14 +87,23 @@ r"""
 """
 # Get all the order_numbers
 #
+# Inputs: q: string the search input from the search bar
+#         offset: int the offset for the list
+#         limit: int the limit for the list
 # Output: order_numbers: list[string]
-@app.get("/all_order_numbers/")
-async def get_all_order_numbers(db: Session = Depends(get_db)):
-    # Delete all old ordernumbers
-    delete_old_ordernumbers(db)
-    
-    all_order_numbers: list[str] = [str(order.number) for order in db.query(OrderNumber).all()]
-    return all_order_numbers
+@app.get("/order_numbers/")
+async def get_order_numbers(
+    q: str = Query("", alias="q"),
+    offset: int = Query(0, ge=0),
+    limit: int = Query(10, ge=1, le=100),
+    db: Session = Depends(get_db)
+):
+    query = db.query(OrderNumber)
+    if q:
+        query = query.filter(OrderNumber.number.contains(q.strip()))
+    total = query.count()
+    order_numbers = [order.number for order in query.order_by(OrderNumber.number).offset(offset).limit(limit)]
+    return {"order_numbers": order_numbers, "total": total}
 
 # Get all the image paths from a order number
 #

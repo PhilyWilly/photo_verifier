@@ -1,4 +1,7 @@
 //const apiKey = localStorage.getItem('api_key'); // Disabled
+let currentSearch = "";
+let offset = 0;
+const limit = 10;
 
 // Sends the form data to the server
 async function submitOrdernumberRequest(e) {
@@ -46,6 +49,12 @@ async function submitOrdernumberRequest(e) {
                 .catch(() => {
                     grid.textContent = `Folgende Bild konnte nicht geladen werden: ${filename}`;
                 });
+            if(data.images.length > 1) {
+                grid.style.width = "70vw";
+            }
+            else {
+                grid.style.width = "";
+            }
             });
         } else {
             grid.textContent = 'Es wurden keine Bilder dieser Bestellnummer gemacht';
@@ -57,31 +66,19 @@ async function submitOrdernumberRequest(e) {
 }
 
 // This creates the suggestions for the search bar
-async function loadSuggestions() {
-    try {
-        // Get all order numbers
-        const response = await fetch('/all_order_numbers/', {
-            method: 'GET',
-            /*headers: {
-                'X-API-Key': apiKey
-            }*/
-        });
-        if (!response.ok) throw new Error("Network response was not ok");
-        
-        // Prepare for incoming data
-        const orderNumbers = await response.json(); 
-        const datalist = document.getElementById('suggestions');
-        datalist.innerHTML = ''; // Clear existing options
-        
-        orderNumbers.forEach(order => {
-            // Create an option element
-            const option = document.createElement('option');
-            option.value = order;
-            datalist.appendChild(option);
-        });
-    } catch (error) {
-        console.error('Error loading suggestions:', error);
-    }
+async function loadSuggestions(search = "", reset = true) {
+    if (reset) offset = 0;
+    currentSearch = search;
+    const response = await fetch(`/order_numbers/?q=${encodeURIComponent(search)}&offset=${offset}&limit=${limit}`);
+    if (!response.ok) return;
+    const data = await response.json();
+    const datalist = document.getElementById('suggestions');
+    if (reset) datalist.innerHTML = '';
+    data.order_numbers.forEach(order => {
+        const option = document.createElement('option');
+        option.value = order;
+        datalist.appendChild(option);
+    });
 }
 
 // On submit call function
@@ -89,3 +86,8 @@ document.getElementById('orderForm').addEventListener('submit', submitOrdernumbe
 
 // On page reload call function
 window.addEventListener('DOMContentLoaded', loadSuggestions);
+
+// Listen for input changes
+document.getElementById('ordernumber').addEventListener('input', (e) => {
+    loadSuggestions(e.target.value, true);
+});

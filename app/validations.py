@@ -15,5 +15,5 @@ def validate_file_list(files: list[UploadFile]):
         if file.content_type != "image/jpeg" and file.content_type != "image/jpg" and file.content_type != "image/png" and file.content_type != "image/png" and file.content_type != "image/webp":
             raise HTTPException(status_code=415, detail="Uploaded file is not an image (valid file types: jpeg, jpg, png, webp)")
         if file.size > int(MAX_FILE_SIZE):
-            raise HTTPException(status_code=413, detail=f"Uploaded image is to big ({MAX_FILE_SIZE/1000} KB max)")
+            raise HTTPException(status_code=413, detail=f"Uploaded image is to big ({int(MAX_FILE_SIZE)/1000} KB max)")
     return True
