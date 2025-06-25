@@ -6,7 +6,7 @@ from sqlalchemy.orm import Session
 from dotenv import load_dotenv
 import os
 
-from app.storing_logic import add_images_to_ordernumber, create_new_order_number, get_image_paths_from_ordernumber
+from app.storing_logic import add_images_to_ordernumber, create_new_order_number, delete_old_ordernumbers, get_image_paths_from_ordernumber
 from app.validations import validate_file_list
 from .database import Image, OrderNumber, get_db
 
@@ -90,6 +90,9 @@ r"""
 # Output: order_numbers: list[string]
 @app.get("/all_order_numbers/")
 async def get_all_order_numbers(db: Session = Depends(get_db)):
+    # Delete all old ordernumbers
+    delete_old_ordernumbers(db)
+    
     all_order_numbers: list[str] = [str(order.number) for order in db.query(OrderNumber).all()]
     return all_order_numbers
 
@@ -99,6 +102,9 @@ async def get_all_order_numbers(db: Session = Depends(get_db)):
 # Output: images: list[string]
 @app.get("/images/{order_number}/")
 async def get_images_for_order(order_number: str, db: Session = Depends(get_db)):
+    # Delete all old ordernumbers
+    delete_old_ordernumbers(db)
+
     order_number: str = order_number.strip() # Strip the number from spaces
     file_paths = get_image_paths_from_ordernumber(order_number, db=db)
     return {"images": file_paths}
@@ -125,6 +131,9 @@ async def create_order_with_images(
     files: list[UploadFile] = File(...),
     db: Session = Depends(get_db)
 ):
+    # Delete all old ordernumbers
+    delete_old_ordernumbers(db)
+
     # Validate files if images
     validate_file_list(files)   
 

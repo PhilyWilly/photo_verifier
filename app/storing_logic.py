@@ -1,3 +1,4 @@
+import datetime
 import shutil
 from fastapi import HTTPException, UploadFile
 from sqlalchemy.orm import Session
@@ -70,3 +71,9 @@ def delete_order_number(order_number: str, db: Session):
     # Delete the order from the database
     db.delete(order)
     db.commit()
+
+def delete_old_ordernumbers(db: Session, months: int = 3):
+    threshold_date = datetime.datetime.utcnow() - datetime.timedelta(days=30*months)
+    old_orders = db.query(OrderNumber).filter(OrderNumber.creation_date < threshold_date).all()
+    for order in old_orders:
+        delete_order_number(order.number, db=db)
