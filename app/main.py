@@ -20,9 +20,10 @@ app.mount("/static", StaticFiles(directory="static"), name="static")
 # Load the secrets :-)
 load_dotenv()
 FAVICON_URL = os.getenv("FAVICON_URL")
-X_API_KEY = os.getenv("X-API-Key")
+#X_API_KEY = os.getenv("X-API-Key")
 DATABASEURL = os.getenv("DATABASEURL")
 
+# !!! THE SECURITY FEATURE IS DISABLED !!!
 # Add security layer for only in company usage
 # 
 # This part is optional, but it ensures, that only clients with the same api key as the server
@@ -33,6 +34,7 @@ DATABASEURL = os.getenv("DATABASEURL")
 # - All HTMLResponses
 # - All static responses
 # - The favicon
+'''
 @app.middleware("http")
 async def check_api_key(request: Request, call_next):
     if request.url.path == "/" or request.url.path == "/image_getter/" or request.url.path == "/image_poster/":
@@ -42,6 +44,7 @@ async def check_api_key(request: Request, call_next):
     if request.headers.get("X-API-Key") != X_API_KEY:
         return JSONResponse(status_code=403, content={"detail": "Forbidden"})
     return await call_next(request)
+'''
 
 r"""
  _   _ _____ __  __ _      

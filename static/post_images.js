@@ -1,4 +1,4 @@
-const apiKey = localStorage.getItem('api_key');
+//const apiKey = localStorage.getItem('api_key'); // Disabled
 
 async function submitPictures(e) {
     e.preventDefault();
@@ -24,9 +24,9 @@ async function submitPictures(e) {
         // Send FormData
         const res = await fetch('/orders/', {
             method: 'POST',
-            headers: {
+            /*headers: {
                 'X-API-Key': apiKey
-            },
+            },*/
             body: formData
         });
         if (!res.ok) throw new Error('Error while uploading'); 

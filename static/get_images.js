@@ -1,4 +1,4 @@
-const apiKey = localStorage.getItem('api_key');
+//const apiKey = localStorage.getItem('api_key'); // Disabled
 
 // Sends the form data to the server
 async function submitOrdernumberRequest(e) {
@@ -14,9 +14,9 @@ async function submitOrdernumberRequest(e) {
         // Collect imagepaths
         const res = await fetch(`/images/${ordernumber}/`, {
             method: 'GET',
-            headers: {
+            /*headers: {
                 'X-API-Key': apiKey
-            }   
+            }*/
         });
         if (!res.ok) throw new Error('Order not found');
         const data = await res.json();
@@ -28,9 +28,9 @@ async function submitOrdernumberRequest(e) {
                 // Fetch the image as a blob with the API key header
                 fetch(`/image/${filename}/`, {
                     method: 'GET',
-                    headers: {
+                    /*headers: {
                         'X-API-Key': apiKey
-                    }
+                    }*/
                 })
                 .then(response => {
                     if (!response.ok) throw new Error('Image not found');
@@ -62,9 +62,9 @@ async function loadSuggestions() {
         // Get all order numbers
         const response = await fetch('/all_order_numbers/', {
             method: 'GET',
-            headers: {
+            /*headers: {
                 'X-API-Key': apiKey
-            }
+            }*/
         });
         if (!response.ok) throw new Error("Network response was not ok");
         
