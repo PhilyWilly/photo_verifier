@@ -4,7 +4,7 @@ from fastapi import HTTPException, UploadFile
 from sqlalchemy.orm import Session
 import os
 
-from .database import Image, OrderNumber
+from database import Image, OrderNumber
 
 def get_image_paths_from_ordernumber(order_number: str, db: Session) -> list[str]:
     # Get the order

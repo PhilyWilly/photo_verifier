@@ -17,7 +17,7 @@ A FastAPI-based web application for uploading, storing, and retrieving images as
 
 1. **Clone the repository**
    ```sh
-   git clone PhilyWilly/photo_verifier
+   git clone https://github.com/PhilyWilly/photo_verifier.git
    cd photo_verifier
    ```
 
@@ -31,10 +31,15 @@ A FastAPI-based web application for uploading, storing, and retrieving images as
    uvicorn main:app --host 0.0.0.0 --port 8000
    ```
 
+   or 
+
+   ```sh
+   python app/main.py
+   ```
+
 4. **Access the app**
    - Image upload: [http://127.0.0.1:8000/image_poster/](http://127.0.0.1:8000/image_poster/)
    - Image search: [http://127.0.0.1:8000/image_getter/](http://127.0.0.1:8000/image_getter/)
-   (dont forget to use the secret api key)
 
 ## Project Structure
 ```
@@ -54,6 +59,9 @@ photo_verifyer/
 │   └── image_poster.html
 ├── uploaded_images/
 ├── requirements.txt
+├── .env
+├── LICENSE
+├── database.db
 └── README.md
 ```
 
@@ -62,9 +70,6 @@ photo_verifyer/
 - `GET /images/{order_number}/` — Get all image filenames for an order number
 - `GET /image/{filename}/` — Download a specific image
 - `GET /all_order_numbers/` — Get all order numbers
-
-## TODOS
-- [ ] Create automated deleting algorithm
 
 ## License
 MIT

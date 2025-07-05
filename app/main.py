@@ -6,9 +6,9 @@ from sqlalchemy.orm import Session
 from dotenv import load_dotenv
 import os
 
-from app.storing_logic import add_images_to_ordernumber, create_new_order_number, delete_old_ordernumbers, get_image_paths_from_ordernumber
-from app.validations import validate_file_list
-from .database import Image, OrderNumber, get_db
+from storing_logic import add_images_to_ordernumber, create_new_order_number, delete_old_ordernumbers, get_image_paths_from_ordernumber
+from validations import validate_file_list
+from database import Image, OrderNumber, get_db
 
 # Setup templates
 templates = Jinja2Templates(directory="templates")
@@ -22,6 +22,8 @@ load_dotenv()
 FAVICON_URL = os.getenv("FAVICON_URL")
 #X_API_KEY = os.getenv("X-API-Key")
 DATABASEURL = os.getenv("DATABASEURL")
+SERVERURL = os.getenv("SERVERURL")
+SERVERPORT = int(os.getenv("SERVERPORT"))
 
 # !!! THE SECURITY FEATURE IS DISABLED !!!
 # Add security layer for only in company usage
@@ -150,3 +152,7 @@ async def create_order_with_images(
     add_images_to_ordernumber(files=files, order_id=order_id, order_number=number,files_index=files_index, db=db)
   
     return order_id
+
+if __name__ == "__main__":
+    import uvicorn
+    uvicorn.run("main:app", host=SERVERURL, port=SERVERPORT, reload=True)
