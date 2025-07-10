@@ -71,5 +71,17 @@ photo_verifyer/
 - `GET /image/{filename}/` — Download a specific image
 - `GET /all_order_numbers/` — Get all order numbers
 
+## Example for .env file
+```env
+DATABASEURL = "sqlite:///example/path/database.db"
+SERVERPATH = "example/path/" 
+SERVERURL = "127.0.0.1"
+SERVERPORT = 8000
+MAX_FILE_SIZE = 2000000 # This are 2000000 bytes or 2MB
+MAX_FILES = 5
+
+FAVICON_URL = "https://www.example.com/favicon.ico"
+```
+
 ## License
 MIT

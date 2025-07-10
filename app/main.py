@@ -10,13 +10,6 @@ from storing_logic import add_images_to_ordernumber, create_new_order_number, de
 from validations import validate_file_list
 from database import Image, OrderNumber, get_db
 
-# Setup templates
-templates = Jinja2Templates(directory="templates")
-
-# Initialize app
-app = FastAPI()
-app.mount("/static", StaticFiles(directory="static"), name="static")
-
 # Load the secrets :-)
 load_dotenv()
 FAVICON_URL = os.getenv("FAVICON_URL")
@@ -24,6 +17,14 @@ FAVICON_URL = os.getenv("FAVICON_URL")
 DATABASEURL = os.getenv("DATABASEURL")
 SERVERURL = os.getenv("SERVERURL")
 SERVERPORT = int(os.getenv("SERVERPORT"))
+SERVERPATH = os.getenv("SERVERPATH")
+
+# Setup templates
+templates = Jinja2Templates(directory=f"{SERVERPATH}templates")
+
+# Initialize app
+app = FastAPI()
+app.mount("/static", StaticFiles(directory=f"{SERVERPATH}static"), name="static")
 
 # !!! THE SECURITY FEATURE IS DISABLED !!!
 # Add security layer for only in company usage
@@ -126,7 +127,7 @@ async def get_images_for_order(order_number: str, db: Session = Depends(get_db))
 # Ouput: Imagefile: image/jpeg
 @app.get("/image/{filename}/")
 async def get_image_file(filename: str):
-    image_path = os.path.join("uploaded_images", filename)
+    image_path = os.path.join(f"{SERVERPATH}uploaded_images", filename)
     if not os.path.exists(image_path):
         raise HTTPException(status_code=404, detail="Image not found")
     return FileResponse(image_path, media_type="image/jpeg", filename=filename)

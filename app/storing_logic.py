@@ -1,10 +1,16 @@
 import datetime
 import shutil
+from dotenv import load_dotenv
 from fastapi import HTTPException, UploadFile
+from h11 import SERVER
 from sqlalchemy.orm import Session
 import os
 
 from database import Image, OrderNumber
+
+# Load the secrets :-)
+load_dotenv()
+SERVERPATH = os.getenv("SERVERPATH")
 
 def get_image_paths_from_ordernumber(order_number: str, db: Session) -> list[str]:
     # Get the order
@@ -37,7 +43,7 @@ def create_new_order_number(order_number: str, db: Session) -> int:
     return order.id, files_index
 
 def add_images_to_ordernumber(files: list[UploadFile], order_id: int, order_number: str, files_index: int, db: Session):
-    image_dir = "uploaded_images"
+    image_dir = f"{SERVERPATH}uploaded_images"
     os.makedirs(image_dir, exist_ok=True)
 
     for index, file in enumerate(files):
@@ -58,7 +64,7 @@ def delete_order_number(order_number: str, db: Session):
 
     # Find all images associated with the order
     images = db.query(Image).filter(Image.ordernumber == order.id).all()
-    image_dir = "uploaded_images"
+    image_dir = f"{SERVERPATH}uploaded_images"
 
     # Delete image files from the directory
     for img in images:

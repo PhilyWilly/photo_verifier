@@ -4,6 +4,7 @@ from dotenv import load_dotenv
 import os
 
 load_dotenv()
+SERVERPATH = os.getenv("SERVERPATH")
 DATABASEURL = os.getenv("DATABASEURL")
 
 # Create engine for database connection
