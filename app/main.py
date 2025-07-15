@@ -112,7 +112,7 @@ async def get_order_numbers(
 #
 # Input: order_number: string
 # Output: images: list[string]
-@app.get("/images/{order_number}/")
+@app.get("/images/")
 async def get_images_for_order(order_number: str, db: Session = Depends(get_db)):
     # Delete all old ordernumbers
     delete_old_ordernumbers(db)

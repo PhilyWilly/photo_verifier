@@ -48,7 +48,7 @@ def add_images_to_ordernumber(files: list[UploadFile], order_id: int, order_numb
 
     for index, file in enumerate(files):
         # Create file name
-        filename: str = f"{order_number}-{index+files_index}.jpeg"
+        filename: str = f"{order_number.replace('/', '-SLASH-')}-{index+files_index}.jpeg"
         file_path: str = os.path.join(image_dir, filename)
         with open(file_path, "wb") as buffer:
             shutil.copyfileobj(file.file, buffer)

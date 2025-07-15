@@ -15,7 +15,7 @@ async function submitOrdernumberRequest(e) {
 
     try {
         // Collect imagepaths
-        const res = await fetch(`/images/${ordernumber}/`, {
+        const res = await fetch(`/images/?order_number=${encodeURIComponent(ordernumber)}`, {
             method: 'GET',
             /*headers: {
                 'X-API-Key': apiKey
