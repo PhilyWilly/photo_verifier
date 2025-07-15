@@ -61,7 +61,7 @@ async function submitOrdernumberRequest(e) {
         }
     } catch (err) {
         if(err)
-        grid.textContent = 'Es ist ein Fehler aufgetreten!';
+        grid.textContent = 'Es ist ein Fehler aufgetreten! Höchstwahrscheinlich wurde diese Artikellnummer nicht angelegt.';
     }
 }
 
