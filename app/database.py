@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, DateTime, String, create_engine, ForeignKey, func
+from sqlalchemy import Boolean, Column, Integer, DateTime, String, create_engine, ForeignKey, func
 from sqlalchemy.orm import declarative_base, sessionmaker
 from dotenv import load_dotenv
 import os
@@ -21,7 +21,9 @@ class Image(Base):
 class OrderNumber(Base):
     __tablename__ = "order_numbers"
     id = Column(Integer, primary_key=True)
-    number = Column(String, unique=True)
+    # number = Column(String, unique=True)
+    number = Column(String, unique=False, nullable=True)
+    retoure = Column(Boolean, default=False)
     creation_date = Column(DateTime, default=func.now())
 
 Base.metadata.create_all(bind=engine)

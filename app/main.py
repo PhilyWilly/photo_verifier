@@ -58,12 +58,26 @@ r"""
 """
 @app.get("/", response_class=HTMLResponse)
 async def default_url(request: Request):
-    return RedirectResponse("/image_getter/")
+    return RedirectResponse("/ordernumber/")
 
 @app.get("/image_getter/", response_class=HTMLResponse)
 async def image_getter_url(request: Request):
+    return RedirectResponse("/ordernumber/")
+
+@app.get("/ordernumber/", response_class=HTMLResponse)
+async def ordernumber_url(request: Request):
     return templates.TemplateResponse(
         "image_getter.html", 
+        {
+            "request": request,
+            "favicon_url": FAVICON_URL
+        }
+    )
+
+@app.get("/return/", response_class=HTMLResponse)
+async def return_url(request: Request):
+    return templates.TemplateResponse(
+        "return_viewer.html", 
         {
             "request": request,
             "favicon_url": FAVICON_URL
@@ -121,6 +135,14 @@ async def get_images_for_order(order_number: str, db: Session = Depends(get_db))
     file_paths = get_image_paths_from_ordernumber(order_number, db=db)
     return {"images": file_paths}
 
+@app.get("/images_by_date/")
+async def get_images_by_date(date:str, db: Session = Depends(get_db)):
+    # Delete all old ordernumbers 
+    delete_old_ordernumbers(db) 
+    date = date.strip() 
+    image_paths = get_images_by_date(date, db=db)
+    return {"images": image_paths}
+
 # Get the image file from the filename
 #
 # Input: filename: string
@@ -140,16 +162,19 @@ async def get_image_file(filename: str):
 @app.post("/orders/")
 async def create_order_with_images(
     number: str = Form(...),
+    retoure: bool = Form(...),
     files: list[UploadFile] = File(...),
     db: Session = Depends(get_db)
 ):
     # Delete all old ordernumbers
     delete_old_ordernumbers(db)
+    print(retoure)
+    print(number)
 
     # Validate files if images
     validate_file_list(files)   
 
-    order_id, files_index = create_new_order_number(number, db=db)
+    order_id, files_index = create_new_order_number(number, retoure=retoure, db=db)
     add_images_to_ordernumber(files=files, order_id=order_id, order_number=number,files_index=files_index, db=db)
   
     return order_id

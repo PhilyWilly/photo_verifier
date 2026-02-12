@@ -2,9 +2,10 @@ import datetime
 import shutil
 from dotenv import load_dotenv
 from fastapi import HTTPException, UploadFile
-from h11 import SERVER
 from sqlalchemy.orm import Session
 import os
+from sqlalchemy import func
+from datetime import datetime, time, timedelta
 
 from database import Image, OrderNumber
 
@@ -24,7 +25,45 @@ def get_image_paths_from_ordernumber(order_number: str, db: Session) -> list[str
     images = db.query(Image).filter(Image.ordernumber == order.id).all()
     return [img.filename for img in images]
 
-def create_new_order_number(order_number: str, db: Session) -> int:
+def get_image_paths_by_date(date: str, db: Session) -> list[str]:
+    # Parse input and use index-friendly range queries for date-only requests.
+    try:
+        input_dt = datetime.fromisoformat(date)
+    except ValueError:
+        # Try to parse as YYYY-MM-DD
+        try:
+            input_dt = datetime.strptime(date, "%Y-%m-%d")
+        except ValueError:
+            raise HTTPException(status_code=400, detail="Invalid date format")
+
+    # Detect whether the original input included a time component.
+    has_time = ("T" in date) or (":" in date)
+
+    if has_time:
+        # Exact datetime match (still can use an index on the datetime column)
+        orders = db.query(OrderNumber).filter(OrderNumber.creation_date == input_dt).all()
+    else:
+        # Date-only: use a half-open range [day_start, next_day) so DB can use indexes
+        day_start = datetime.combine(input_dt.date(), time.min)
+        next_day = day_start + timedelta(days=1)
+        orders = db.query(OrderNumber).filter(
+            OrderNumber.creation_date >= day_start,
+            OrderNumber.creation_date < next_day
+        ).all()
+
+    if not orders:
+        raise HTTPException(status_code=404, detail="Order number not found")
+
+    # Collect all image filenames for the matching orders
+    filenames: list[str] = []
+    for order in orders:
+        images_from_order: list[Image] = db.query(Image).filter(Image.ordernumber == order.id).all()
+        for img in images_from_order:
+            filenames.append(img.filename)
+
+    return filenames
+
+def create_new_order_number(order_number: str, retoure: bool, db: Session) -> int:
     # Check if order number exists
     order_number = str(order_number).strip() # Strip the number from spaces
     if db.query(OrderNumber).filter(OrderNumber.number == order_number).first():
@@ -34,7 +73,9 @@ def create_new_order_number(order_number: str, db: Session) -> int:
     else:
         # Order does not excists yet
         # Create new order
-        order = OrderNumber(number=order_number)
+        if order_number == "" or order_number == "retoure" or order_number == "retoure!":
+            order_number = None
+        order = OrderNumber(number=order_number, retoure=retoure)
         db.add(order)
         db.commit()
         db.refresh(order)
@@ -79,7 +120,7 @@ def delete_order_number(order_number: str, db: Session):
     db.commit()
 
 def delete_old_ordernumbers(db: Session, months: int = 3):
-    threshold_date = datetime.datetime.utcnow() - datetime.timedelta(days=30*months)
+    threshold_date = datetime.utcnow() - timedelta(days=30*months)
     old_orders = db.query(OrderNumber).filter(OrderNumber.creation_date < threshold_date).all()
     for order in old_orders:
         delete_order_number(order.number, db=db)
