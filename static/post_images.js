@@ -5,7 +5,7 @@ async function submitPictures(e) {
 
     // Get inputs
     const ordernumber = document.getElementById('ordernumber').value;
-    const retoure = document.getElementById('retoure').value;
+    const retoure = document.getElementById('retoure').checked;
     const files = document.getElementById('images').files;
 
     // Check if every input is satisfied

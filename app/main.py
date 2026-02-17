@@ -6,7 +6,7 @@ from sqlalchemy.orm import Session
 from dotenv import load_dotenv
 import os
 
-from storing_logic import add_images_to_ordernumber, create_new_order_number, delete_old_ordernumbers, get_image_paths_from_ordernumber
+from storing_logic import add_images_to_ordernumber, create_new_order_number, delete_old_ordernumbers, get_image_paths_from_ordernumber, get_image_paths_by_date
 from validations import validate_file_list
 from database import Image, OrderNumber, get_db
 
@@ -118,9 +118,18 @@ async def get_order_numbers(
     query = db.query(OrderNumber)
     if q:
         query = query.filter(OrderNumber.number.contains(q.strip()))
+    query = query.filter(OrderNumber.number.is_not("retour!"))
     total = query.count()
     order_numbers = [order.number for order in query.order_by(OrderNumber.number).offset(offset).limit(limit)]
     return {"order_numbers": order_numbers, "total": total}
+
+# Get all the dates from retoure order_numbers
+#
+# Output: dates: list[string]
+@app.get("/retoure_dates/")
+async def get_retoure_dates(db: Session = Depends(get_db)):
+    dates = db.query(OrderNumber.creation_date).filter(OrderNumber.retoure == True).order_by(OrderNumber.creation_date.desc()).all()
+    return {"dates": [date[0].isoformat() for date in dates]}
 
 # Get all the image paths from a order number
 #
@@ -135,12 +144,18 @@ async def get_images_for_order(order_number: str, db: Session = Depends(get_db))
     file_paths = get_image_paths_from_ordernumber(order_number, db=db)
     return {"images": file_paths}
 
-@app.get("/images_by_date/")
+# Get all the image paths by date
+#
+# Input: date: string in the format "YYYY-MM-DD"
+# Output: images: list[string]
+@app.get("/images_by_date/{date}/")
 async def get_images_by_date(date:str, db: Session = Depends(get_db)):
     # Delete all old ordernumbers 
+    print("Deleting old ordernumbers...")
     delete_old_ordernumbers(db) 
     date = date.strip() 
-    image_paths = get_images_by_date(date, db=db)
+    print(f"Getting images for date: {date}")
+    image_paths = get_image_paths_by_date(date, db=db)
     return {"images": image_paths}
 
 # Get the image file from the filename
