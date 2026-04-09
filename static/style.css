@@ -46,6 +46,7 @@ input::file-selector-button {
 .collapsible {
     padding: 0px;
     min-width: 90vw;
+    margin: 8px 0px;
 }
 .collapsible > * {
     max-width: 90vw;

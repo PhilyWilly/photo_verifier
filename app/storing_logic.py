@@ -66,15 +66,27 @@ def get_image_paths_by_date(date: str, db: Session) -> list[str]:
 def create_new_order_number(order_number: str, retoure: bool, db: Session) -> int:
     # Check if order number exists
     order_number = str(order_number).strip() # Strip the number from spaces
-    if db.query(OrderNumber).filter(OrderNumber.number == order_number).first():
+    if db.query(OrderNumber).filter(OrderNumber.number == order_number).first() and not retoure:
         order = db.query(OrderNumber).filter(OrderNumber.number == order_number).first()
         files_index = db.query(Image).filter(Image.ordernumber == order.id).count()
         print(f"{files_index=}")
     else:
         # Order does not excists yet
         # Create new order
-        if order_number == "" or order_number == "retoure" or order_number == "retoure!":
-            order_number = None
+        if order_number == "" or order_number == "retoure" or order_number == "retoure!" or order_number == "retour" or order_number == "retour!":
+            order_number = "retoure!"
+            day_start = datetime.combine(datetime.now().date(), time.min)
+            next_day = day_start + timedelta(days=1)
+            order = db.query(OrderNumber).filter(
+                OrderNumber.creation_date >= day_start,
+                OrderNumber.creation_date < next_day
+            ).first()
+            print("Checking for existing retoure orders today...")
+            if order:
+                print("Found existing retoure order for today, using that one...")
+                files_index = db.query(Image).filter(Image.ordernumber == order.id).count()
+                print(f"{files_index=}")
+                return order.id, files_index
         order = OrderNumber(number=order_number, retoure=retoure)
         db.add(order)
         db.commit()
@@ -90,6 +102,8 @@ def add_images_to_ordernumber(files: list[UploadFile], order_id: int, order_numb
     for index, file in enumerate(files):
         # Create file name
         filename: str = f"{order_number.replace('/', '-SLASH-')}-{index+files_index}.jpeg"
+        if order_number == "retoure!" or order_number == "retour!":
+            filename = f"retoure-{order_id}-{index+files_index}.jpeg"
         file_path: str = os.path.join(image_dir, filename)
         with open(file_path, "wb") as buffer:
             shutil.copyfileobj(file.file, buffer)
